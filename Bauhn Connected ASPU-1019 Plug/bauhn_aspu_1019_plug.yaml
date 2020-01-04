@@ -1,0 +1,100 @@
+# BAUHN ASPU-1019 Plug with USB
+# -----------------------
+# Brand: Bauhn Connected
+# Model: ASPU-1019 Plug with USB
+# Runs Dual Relays (one on Active and one on Nutral) and uses a TYWE2S wifi module, USB cannot be turned off.
+# Tasmota Template: {"NAME":"Buahn Smart Pl","GPIO":[0,0,0,0,21,22,0,0,0,56,17,0,0],"FLAG":0,"BASE":18}
+
+substitutions:
+# ESPHome nodename
+  devicename: bauhn_aspu_1019_plug
+# A prettier name
+  upper_devicename: Bauhn ASPU-1019 Plug
+
+esphome:
+  name: $devicename
+  platform: ESP8266
+  board: esp01_1m
+
+wifi:
+  ssid: "SSID"
+  password: "PASSWORD"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "bauhn_aspu_1019_plug"
+    password: "PASSWORD"
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Web server
+web_server:
+  port: 80
+
+# Enable Home Assistant API
+api:
+  password: "PASSWORD"
+
+ota:
+  password: "PASSWORD"
+  
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO14
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "${upper_devicename}_button"
+    #toggle both relays on push, and turns led on
+    on_press:
+     - switch.toggle: relaysandled
+
+switch:
+  - platform: gpio
+    #name: "${upper_devicename}_Power_relay1"
+    pin: GPIO04
+    id: relay
+  - platform: gpio
+    #name: "${upper_devicename}_Power_relay2"
+    pin: GPIO05
+    id: relay2
+  - platform: template
+    name: "${upper_devicename}_RelayLed"
+    id: relaysandled
+    optimistic: true
+    on_turn_on:
+    - switch.turn_on: relay
+    - switch.turn_on: relay2
+    - light.turn_on: led
+    on_turn_off:
+    - switch.turn_off: relay
+    - switch.turn_off: relay2
+    - light.turn_off: led
+
+output:
+  # Blue led output on system
+  - platform: esp8266_pwm
+    id: state_led
+    pin:
+      number: GPIO13
+      inverted: true
+
+light:
+  # Relay state light
+  - platform: monochromatic
+    output: state_led
+    id: led
+
+sensor:
+  - platform: wifi_signal
+    name: "${upper_devicename}_wifi_signal"
+    update_interval: 30s
+  - platform: uptime
+    name: "${upper_devicename}_uptime"
+    update_interval: 120s
+text_sensor:
+  - platform: version
+    name: "${upper_devicename}_version"
