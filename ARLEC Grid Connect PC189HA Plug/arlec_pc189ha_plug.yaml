@@ -1,0 +1,87 @@
+# ARLEC Grid Connect PC189HA Plug
+# -----------------------
+# Brand: ARLEC
+# Model: PC189HA Plug
+# Uses a TYWE2S wifi module.
+# Has blue and red LED
+# Tasmota Template: They were all a bit wrong. GPIO14 - Button, GPIO4 - Blue LED, GPIO13 - Red LED, GPIO12 - Relay
+
+substitutions:
+# ESPHome nodename
+  devicename: arlec_pc189ha_plug
+# A prettier name
+  upper_devicename: Arlec PC189HA Plug
+
+esphome:
+  name: $devicename
+  platform: ESP8266
+  board: esp01_1m
+
+wifi:
+  ssid: "SSID"
+  password: "PASSWORD"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Arlec_PC189HA_plug"
+    password: "PASSWORD"
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Web server
+web_server:
+  port: 80
+
+# Enable Home Assistant API
+api:
+  password: "PASSWORD"
+
+ota:
+  password: "PASSWORD"
+  
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO14
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "${upper_devicename}_button"
+    #toggle both relays on push, and turns led on
+    on_press:
+      - switch.toggle: relay
+  - platform: status
+    name: "Status"
+
+switch:
+  - platform: gpio
+    id: blue_led
+    pin:
+      number: GPIO4
+      inverted: true
+  - platform: gpio
+    id: red_led
+    pin:
+      number: GPIO13
+      inverted: true
+
+  - platform: gpio
+    name: "Arlec Grid Connect PC189HA"
+    pin: GPIO12
+    id: relay
+
+    # Turns red LED off and turns blue LED on when you turn the plug off.
+    # Stock plug doesn't do this, to restore normal behavior (Just Blue when on) remove "switch.turn_off: red_led"
+    # You can get purple if you turn both on.
+    on_turn_on:
+      - switch.turn_off: red_led
+      - switch.turn_on: blue_led
+
+    # Turns red LED on and turns blue LED off when you turn the plug off.
+    # Stock plug doesn't do this, to restore normal behavior (Just Blue when on) remove "switch.turn_on: red_led"
+    # You can get purple if you turn both on.
+    on_turn_off:
+      - switch.turn_off: blue_led
+      - switch.turn_on: red_led

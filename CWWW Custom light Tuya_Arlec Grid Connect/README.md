@@ -1,4 +1,4 @@
-# Arlec - Grid Conenct GLD110HA Plug (TYWE3L)
+# Arlec - Grid Connect GLD110HA Plug (TYWE3L)
 Model purchased from Bunnings Aus for AUD$27 in a kit of 2 globes and 2 smart plugs
 
 ![Image](./images/device.jpg?raw=true)
@@ -11,7 +11,7 @@ Smart Globe with CWWW and brightness control, based in ESP8266.
 
 Device has inbuilt gamma correction and brightness control IC BP5926. Standard ESPHome CWWW platform will not work with it.
 
-I created a custom light output to work with ESPhome and its temperature slider. Please see below for a difference on how these glbs operate vs standard CWWW.
+I created a custom light output to work with ESPhome and its temperature slider. Please see below for a difference on how these globes operate vs standard CWWW.
 
 ![Image](./images/CustomLightWork.png?raw=true)
 
