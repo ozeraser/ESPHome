@@ -1,16 +1,17 @@
-# ARLEC Grid Connect PC189HA Plug
+# iDigital Smart home WIFI Power Plug with USB Port
 # -----------------------
-# Brand: ARLEC
-# Model: PC189HA Plug
-# Uses a TYWE2S wifi module.
+# Brand: iDigital
+# Model: 30099179 Plug with USB
+# I refer to it as  iDigital Smart Plug.
+# Uses a ESP8266-S3 wifi module.
 # Has blue and red LED
-# Tasmota Template: They were all a bit wrong. GPIO14 - Button, GPIO4 - Blue LED, GPIO13 - Red LED, GPIO12 - Relay
+# Tasmota Template: None existed, GPIO4 - Red LED, GPIO12 - Relay, GPIO13 - Button
 
 substitutions:
 # ESPHome nodename
-  devicename: arlec_pc189ha_plug
+  devicename: idigital_smart_plug
 # A prettier name
-  upper_devicename: Arlec PC189HA Plug
+  upper_devicename: iDigital Smart Plug
 
 esphome:
   name: $devicename
@@ -45,7 +46,7 @@ ota:
 binary_sensor:
   - platform: gpio
     pin:
-      number: GPIO14
+      number: GPIO13
       mode: INPUT_PULLUP
       inverted: True
     name: "${upper_devicename}_button"
@@ -57,31 +58,23 @@ binary_sensor:
 
 switch:
   - platform: gpio
-    id: blue_led
-    pin:
-      number: GPIO4
-      inverted: true
-  - platform: gpio
     id: red_led
     pin:
-      number: GPIO13
-      inverted: true
-
+      number: GPIO4
+      inverted: True
   - platform: gpio
     name: "${upper_devicename}_relay"
     pin: GPIO12
     id: relay
 
-    # Turns red LED off and turns blue LED on when you turn the plug off.
-    # Stock plug doesn't do this, to restore normal behavior (Just Blue when on) remove "switch.turn_off: red_led"
-    # You can get purple if you turn both on.
+    # Turns red LED off .
+    # Plug doesnt let you disable blue led.
+    # You can get purple if you turn it on.
     on_turn_on:
       - switch.turn_off: red_led
-      - switch.turn_on: blue_led
 
-    # Turns red LED on and turns blue LED off when you turn the plug off.
-    # Stock plug doesn't do this, to restore normal behavior (Just Blue when on) remove "switch.turn_on: red_led"
+    # Turns red LED on
+    # Plug doesnt let you disable blue led.
     # You can get purple if you turn both on.
     on_turn_off:
-      - switch.turn_off: blue_led
       - switch.turn_on: red_led
