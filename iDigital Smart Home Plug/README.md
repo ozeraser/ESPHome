@@ -24,7 +24,7 @@ Internal module has no branding but is flashed with generic Tuya (even the app i
 
 Pinout:
 
-![Image](./images/pinout.jpg?raw=true)
+![Image](./images/pinout.png?raw=true)
 
 Thanks to gn0st1c for this simple pinout graphic; https://github.com/xoseperez/espurna/issues/1502#issuecomment-456255987
 
