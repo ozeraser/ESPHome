@@ -20,7 +20,7 @@ Device has Dual relays, one GPIO triggers both.
 
 Device has red and blue LEDs, blue LED is automatically switched on and cannot be turned off. Red on GPIO 14, purple if you invert LED.
 
-Internal module has no branding but is flashed with generic Tuya (even the app is native tuya). It is actually an ESP8266-S3 ([datasheet](./images/ESP8266-S3_WiFi_Module_Datasheet.pdf)
+Internal module has no branding but is flashed with generic Tuya (even the app is native tuya). It is actually an ESP8266-S3 ([datasheet](./images/ESP8266-S3_WiFi_Module_Datasheet.pdf) )
 
 Pinout:
 
