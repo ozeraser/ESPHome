@@ -1,4 +1,4 @@
-# iDigital Smart hbome WIFI Power Plug with USB Port
+# iDigital Smart Home WIFI Power Plug with USB Port
 
 Yes what a great name :|, from here on I will call it the iDigital Smart Plug
 
