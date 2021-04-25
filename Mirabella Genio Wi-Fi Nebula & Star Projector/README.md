@@ -24,7 +24,7 @@ So good news is the ESP-12E or ESP-12F is the same pin out. Bad news is you need
 
 Now thanks to Jobbel https://github.com/Jobbel/SmartStarProjector-ESP-Mod who had done a similar activity for finding out what resistors are not needed.
 
-So remove resistor R17, R18 and caoaitor C6 from the PCB as shown on the Image below (red box)
+So remove resistor R17, R18 and capacitor C6 from the PCB as shown on the Image below (red box)
 
 Use the salvaged R17,R18 or another 10k resistor to pull GPIO15 down to ground (yellow box), without this change the ESP8266 won't boot 
 
@@ -32,7 +32,7 @@ Use the salvaged R17,R18 or another 10k resistor to pull GPIO15 down to ground (
 
 If you want you can pull the motor gearbox down and give it some additional grease here you can, but its most probably not needed.
 
-Re-assemble ensuring the cables are put in the right slots and the right direction, also ensure no cables interfere with the cogs.
+Reassemble ensuring the cables are put in the right slots and the right direction, also ensure no cables interfere with the cogs.
 
 Pinout:
 
@@ -69,7 +69,7 @@ If you do not want the fallback hotspot remove lines 22-24
 Line 35: api:
 Line 32:   password: 'your secret api password' ** Uncomment and change this to your ESPHome API password if required**
 Line 42: ota:
-Line 37:   password: 'your secret ota password' ** Uncomment and change this to your ESPHome ota password if requried**
+Line 37:   password: 'your secret ota password' ** Uncomment and change this to your ESPHome ota password if required**
 
 ```
 

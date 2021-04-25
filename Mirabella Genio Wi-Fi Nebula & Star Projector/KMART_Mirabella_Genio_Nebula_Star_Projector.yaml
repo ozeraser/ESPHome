@@ -93,11 +93,16 @@ output:
     id: output_statusb
     pin: GPIO15
     inverted: True
+    
 # Light definitions, effects
+
 light:
+
+    #Core RGB Light
+    
   - platform: rgb
     name: '${name} Light'
-    id: '${device}'
+    id: '${device}'   
     red: output_red
     green: output_green
     blue: output_blue
@@ -131,22 +136,47 @@ light:
             call.set_white(0.0);
             call.perform();
     on_turn_on:
-      output.turn_off: output_statusa
+      output.turn_off: output_statusa #turns the first status LED off when RGB light is turned on
     on_turn_off:
-      output.turn_on: output_statusa
+      output.turn_on: output_statusa #turns the first status LED on when RGB light is turned off
+      
+    #Laser Power
+    
   - platform: monochromatic
     name: '${name} Laser'
     id: laser
     output: output_laser_pwm
     on_turn_on:
-      output.turn_off: output_statusb
+      output.turn_off: output_statusb #turns the second status LED off when its turned on
     on_turn_off:
-      output.turn_on: output_statusb
-    
+      output.turn_on: output_statusb #turns the second status LED on when its turned off
+      
+    #Spinning Motor Speed 
+     
   - platform: monochromatic
     name: '${name} Motor'
     id: motor
     output: output_motor_pwm
+
+# Tactile Side Button
+
+# Sorry in advance this is a bit of a nested if else coding disaster. It was late and I wasnt sure how i wanted it to work.
+# It does work well with no logic loops, but feel free to submit a better way.
+
+# In short, upon each Button press it works like this:
+# |      RGB Status     |    Laser Status     |     Motor Status    |
+# |----------|----------|----------|----------|----------|----------|
+# | Previous |    New   | Previous |    New   | Previous |    New   |
+# |   State  |   State  |   State  |   State  |   State  |   State  |
+# |----------|----------|----------|----------|----------|----------|
+# |    OFF   |    ON    |    OFF   |     -    |    OFF   |    ON    | Turn Light and motor on.
+# |----------|----------|----------|----------|----------|----------|
+# |    ON    |     -    |    OFF   |    ON    |     -    |    ON    | Turn Laser and motor on.
+# |----------|----------|----------|----------|----------|----------|
+# |    ON    |    OFF   |    ON    |    OFF   |    ON    |    OFF   | Turn Laser, Light and Motor Off.
+# |----------|----------|----------|----------|----------|----------|
+# |    OFF   |    ON    |    ON    |     -    |    -     |    ON    | Turn Laser on.
+# |----------|----------|----------|----------|----------|----------|
 
 binary_sensor:
   - platform: gpio
