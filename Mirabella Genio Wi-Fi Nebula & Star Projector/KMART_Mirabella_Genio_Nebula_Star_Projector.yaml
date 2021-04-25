@@ -1,0 +1,197 @@
+# device declaration: Mirabella Genio Wi-Fi Nebula & Star Projector
+# buying from: Kmart (Australia)
+# variables
+substitutions:
+  name: 'rgb_stars'
+  device: 'rgb_stars'
+  reboot_timeout: 1h
+  update_interval: 1min
+
+# core configuration
+esphome:
+  name: ${device}
+  platform: ESP8266
+  board: esp01_1m
+
+# WiFi + network settings
+wifi:
+  ssid: "SSID"
+  password: "PASSWORD"
+  fast_connect: true
+  reboot_timeout: ${reboot_timeout}
+  ap:
+    ssid: "rgb_stars Fallback Hotspot"
+    password: "PASSWORD"         #  wifi password when in access point mode. Leave '' for no password.
+
+# captive portal for access point mode
+captive_portal:
+
+# enabling home assistant legacy api
+api:
+  # uncomment below if needed
+  # password: 'your secret api password'
+
+# enabling over the air updates
+ota:
+  # uncomment below if needed
+  # password: 'your secret ota password'
+
+# synchronizing time with home assistant
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+    
+# Enable Web server
+web_server:
+  port: 80
+
+# Logging
+logger:
+  level: DEBUG
+  # Disable logging to serial
+  baud_rate: 0
+
+# Defining the output pins
+output:
+  # Red LED
+  - platform: esp8266_pwm
+    id: output_red
+    pin: GPIO4
+    inverted: True
+  # Green LED
+  - platform: esp8266_pwm
+    id: output_green
+    pin: GPIO12
+    inverted: True
+  # Blue LED
+  - platform: esp8266_pwm 
+    id: output_blue
+    pin: GPIO14
+    inverted: True
+  # Laser PWM out
+  - platform: esp8266_pwm
+    id: output_laser_pwm
+    pin: GPIO5
+    inverted: True
+  #  frequency: 2000 Hz
+  # Motor PWM out
+  # Note: Noticed issues with this PWM leaking to the Laser control
+  # Unable to trace it back to source, could be pull down resistors on the motherboard, or just a by product of bad soldering, or bad ESP pin with a short somewhere.
+  - platform: esp8266_pwm
+    id: output_motor_pwm
+    pin: GPIO13
+  #  frequency: 8 Hz
+  # Blue button Status LED A
+  # I use this to show if the RGB light is on
+  - platform: esp8266_pwm
+    id: output_statusa
+    pin: GPIO0
+    inverted: True
+  # Blue button Status LED B (Red on some models)
+  # I use this to show if the Laser light is on
+  - platform: esp8266_pwm
+    id: output_statusb
+    pin: GPIO15
+    inverted: True
+# Light definitions, effects
+light:
+  - platform: rgb
+    name: '${name} Light'
+    id: '${device}'
+    red: output_red
+    green: output_green
+    blue: output_blue
+    effects:
+      - random:
+          name: Random
+          transition_length: 2.5s
+          update_interval: 3s
+      - random:
+          name: Random Slow
+          transition_length: 10s
+          update_interval: 5s
+      - lambda:
+          name: 'Random fixed brightness'
+          update_interval: 20.0s
+          lambda: |-
+            auto call = id(${device}).turn_on();
+            call.set_transition_length(4000);
+            light::ESPColor c = light::ESPColor::random_color();
+            call.set_rgb((c.red%128)/255.0, (c.green%128)/255.0, (c.blue%128)/255.0);
+            call.set_white(0.0);
+            call.perform();
+      - lambda:
+          name: 'Random Warp core'
+          update_interval: 20.0s
+          lambda: |-
+            auto call = id(${device}).turn_on();
+            call.set_transition_length(4000);
+            light::ESPColor c = light::ESPColor::random_color();
+            call.set_rgb(0, (c.green%128)/255.0, (c.blue%128)/255.0);
+            call.set_white(0.0);
+            call.perform();
+    on_turn_on:
+      output.turn_off: output_statusa
+    on_turn_off:
+      output.turn_on: output_statusa
+  - platform: monochromatic
+    name: '${name} Laser'
+    id: laser
+    output: output_laser_pwm
+    on_turn_on:
+      output.turn_off: output_statusb
+    on_turn_off:
+      output.turn_on: output_statusb
+    
+  - platform: monochromatic
+    name: '${name} Motor'
+    id: motor
+    output: output_motor_pwm
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: 16
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "Power Button"
+    on_press:
+        then:
+          if:
+            condition:
+             and:
+              # - binary_sensor.is_on: esp32_local_switch
+               - light.is_off: '${device}'
+               - light.is_off: laser 
+            then:
+             - light.turn_on: motor
+             - light.turn_on: '${device}'
+            else:
+             if:
+              condition:
+               and:
+                - light.is_on: '${device}'
+                - light.is_off: laser 
+              then:
+               - light.turn_on: motor
+               - light.turn_on: laser
+              else:
+               if:
+                condition:
+                 and:
+                  - light.is_on: '${device}'
+                  - light.is_on: laser 
+                then:
+                  - light.turn_off: '${device}'
+                  - light.turn_off: laser
+                  - light.turn_off: motor
+                else:
+                 if:
+                  condition:
+                   and:
+                    - light.is_on: laser
+                    - light.is_off: '${device}' 
+                  then:
+                    - light.turn_on: '${device}'
+                    - light.turn_on: motor
+
